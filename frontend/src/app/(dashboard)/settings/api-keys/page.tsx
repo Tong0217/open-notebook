@@ -172,6 +172,7 @@ function CredentialFormDialog({
   const isVertex = provider === 'vertex'
   const isOllama = provider === 'ollama'
   const isOpenAICompatible = provider === 'openai_compatible'
+  const isDashScope = provider === 'dashscope'
   const requiresApiKey = !isVertex && !isOllama && !isOpenAICompatible
 
   const [name, setName] = useState('')
@@ -181,6 +182,7 @@ function CredentialFormDialog({
   const [project, setProject] = useState('')
   const [location, setLocation] = useState('')
   const [credentialsPath, setCredentialsPath] = useState('')
+  const [languageType, setLanguageType] = useState('')
   // Modalities
   const [modalities, setModalities] = useState<string[]>([])
 
@@ -192,6 +194,7 @@ function CredentialFormDialog({
       setProject(credential.project || '')
       setLocation(credential.location || '')
       setCredentialsPath(credential.credentials_path || '')
+      setLanguageType(credential.language_type || '')
       setModalities(credential.modalities || [])
     } else {
       setName('')
@@ -200,6 +203,7 @@ function CredentialFormDialog({
       setProject('')
       setLocation('')
       setCredentialsPath('')
+      setLanguageType('')
       setModalities(PROVIDER_MODALITIES[provider] || ['language'])
     }
   }, [credential, provider])
@@ -222,6 +226,9 @@ function CredentialFormDialog({
         if (location !== (credential.location || '')) data.location = location.trim() || undefined
         if (credentialsPath !== (credential.credentials_path || '')) data.credentials_path = credentialsPath.trim() || undefined
       }
+      if (isDashScope) {
+        if (languageType !== (credential.language_type || '')) data.language_type = languageType.trim() || undefined
+      }
       updateCredential.mutate({ credentialId: credential.id, data }, { onSuccess })
     } else {
       const data: CreateCredentialRequest = {
@@ -235,6 +242,9 @@ function CredentialFormDialog({
         data.project = project.trim() || undefined
         data.location = location.trim() || undefined
         data.credentials_path = credentialsPath.trim() || undefined
+      }
+      if (isDashScope) {
+        data.language_type = languageType.trim() || undefined
       }
       createCredential.mutate(data, { onSuccess })
     }
@@ -363,6 +373,27 @@ function CredentialFormDialog({
                 disabled={isSubmitting}
               />
               <p className="text-xs text-muted-foreground">{t.apiKeys.baseUrlOverrideHint}</p>
+            </div>
+          )}
+
+          {/* Language Type (DashScope TTS) */}
+          {isDashScope && (
+            <div className="space-y-2">
+              <Label htmlFor="language-type">Language Type (TTS)</Label>
+              <select
+                id="language-type"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={languageType}
+                onChange={(e) => setLanguageType(e.target.value)}
+                disabled={isSubmitting}
+              >
+                <option value="">Default (Chinese)</option>
+                <option value="Chinese">Chinese</option>
+                <option value="English">English</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Korean">Korean</option>
+              </select>
+              <p className="text-xs text-muted-foreground">Language for DashScope TTS synthesis</p>
             </div>
           )}
 

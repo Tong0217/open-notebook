@@ -47,6 +47,7 @@ class Credential(ObjectModel):
         "project",
         "location",
         "credentials_path",
+        "language_type",
     }
 
     name: str
@@ -63,6 +64,7 @@ class Credential(ObjectModel):
     project: Optional[str] = None
     location: Optional[str] = None
     credentials_path: Optional[str] = None
+    language_type: Optional[str] = None  # For TTS providers (e.g., DashScope)
 
     def to_esperanto_config(self) -> Dict[str, Any]:
         """
@@ -94,6 +96,8 @@ class Credential(ObjectModel):
             config["location"] = self.location
         if self.credentials_path:
             config["credentials_path"] = self.credentials_path
+        if self.language_type:
+            config["language_type"] = self.language_type
         return config
 
     @classmethod
