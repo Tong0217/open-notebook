@@ -66,9 +66,10 @@ class DashScopeTextToSpeech:
         self.model_name = model_name
         if config:
             self.api_key = api_key or config.get("api_key") or os.environ.get("DASHSCOPE_API_KEY")
+            self.language_type = config.get("language_type") or language_type
         else:
             self.api_key = api_key or os.environ.get("DASHSCOPE_API_KEY")
-        self.language_type = language_type
+            self.language_type = language_type
         self.config = config or {}
         self._config = kwargs
         self.base_url = base_url
