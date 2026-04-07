@@ -1,5 +1,13 @@
 """Surreal-commands integration for Open Notebook"""
 
+# Clear proxy environment variables before any imports that might trigger network connections
+import os
+for _proxy_var in [
+    "http_proxy", "https_proxy", "HTTP_PROXY", "HTTPS_PROXY",
+    "all_proxy", "ALL_PROXY", "no_proxy", "NO_PROXY"
+]:
+    os.environ.pop(_proxy_var, None)
+
 from .embedding_commands import (
     embed_insight_command,
     embed_note_command,

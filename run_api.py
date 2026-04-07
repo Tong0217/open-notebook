@@ -7,6 +7,14 @@ import os
 import sys
 from pathlib import Path
 
+# Clear proxy environment variables to avoid interfering with local database connections
+# This must be done before any network operations (like database connections)
+for proxy_var in [
+    "http_proxy", "https_proxy", "HTTP_PROXY", "HTTPS_PROXY",
+    "all_proxy", "ALL_PROXY", "no_proxy", "NO_PROXY"
+]:
+    os.environ.pop(proxy_var, None)
+
 import uvicorn
 
 # Add the current directory to Python path so imports work

@@ -152,17 +152,51 @@ worker-restart: worker-stop
 	@sleep 2
 	@$(MAKE) worker-start
 
+# Check if Docker is running, if not try to start it
+# Supports macOS (Docker Desktop) and Linux (systemd/service)
+DOCKER_CHECK := $(shell docker info >/dev/null 2>&1 && echo "running" || echo "stopped")
+
 # === Service Management ===
 start-all:
 	@echo "🚀 Starting Open Notebook (Database + API + Worker + Frontend)..."
+	@echo "🐳 Checking Docker..."
+	@if [ "$(DOCKER_CHECK)" != "running" ]; then \
+		echo "⚠️  Docker is not running, attempting to start..."; \
+		if [ "$(shell uname)" = "Darwin" ]; then \
+			echo "🍎 macOS detected, starting Docker Desktop..."; \
+			open -a Docker || { echo "❌ Failed to start Docker Desktop. Please start it manually."; exit 1; }; \
+			echo "⏳ Waiting for Docker to initialize..."; \
+			for i in $$(seq 1 30); do \
+				docker info >/dev/null 2>&1 && break; \
+				sleep 1; \
+			done; \
+		elif [ "$(shell uname)" = "Linux" ]; then \
+			echo "🐧 Linux detected, starting Docker service..."; \
+			if command -v systemctl >/dev/null 2>&1; then \
+				sudo systemctl start docker || { echo "❌ Failed to start Docker via systemctl."; exit 1; }; \
+			elif command -v service >/dev/null 2>&1; then \
+				sudo service docker start || { echo "❌ Failed to start Docker via service."; exit 1; }; \
+			else \
+				echo "❌ Could not determine how to start Docker. Please start it manually."; \
+				exit 1; \
+			fi; \
+			echo "⏳ Waiting for Docker to initialize..."; \
+			sleep 3; \
+		else \
+			echo "❌ Unsupported OS. Please start Docker manually."; \
+			exit 1; \
+		fi; \
+	fi
+	@docker info >/dev/null 2>&1 || { echo "❌ Docker failed to start. Please start it manually."; exit 1; }
+	@echo "✅ Docker is running"
 	@echo "📊 Starting SurrealDB..."
-	@docker compose -f docker-compose.dev.yml up -d surrealdb
+	@docker compose up -d surrealdb
 	@sleep 3
 	@echo "🔧 Starting API backend..."
-	@uv run run_api.py &
+	@env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u all_proxy -u ALL_PROXY -u no_proxy -u NO_PROXY uv run run_api.py &
 	@sleep 3
 	@echo "⚙️ Starting background worker..."
-	@uv run --env-file .env surreal-commands-worker --import-modules commands &
+	@env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u all_proxy -u ALL_PROXY -u no_proxy -u NO_PROXY uv run --env-file .env surreal-commands-worker --import-modules commands &
 	@sleep 2
 	@echo "🌐 Starting Next.js frontend..."
 	@echo "✅ All services started!"

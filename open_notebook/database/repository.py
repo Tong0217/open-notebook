@@ -46,6 +46,14 @@ def ensure_record_id(value: Union[str, RecordID]) -> RecordID:
 
 @asynccontextmanager
 async def db_connection():
+    # Clear proxy environment variables to prevent SOCKS proxy interference
+    # with localhost database connections
+    for _proxy_var in [
+        "http_proxy", "https_proxy", "HTTP_PROXY", "HTTPS_PROXY",
+        "all_proxy", "ALL_PROXY", "no_proxy", "NO_PROXY"
+    ]:
+        os.environ.pop(_proxy_var, None)
+    
     db = AsyncSurreal(get_database_url())
     await db.signin(
         {
