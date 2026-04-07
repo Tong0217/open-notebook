@@ -10,7 +10,7 @@ services:
     environment:
       - SURREAL_EXPERIMENTAL_GRAPHQL=true
     restart: always
-    pull_policy: always
+    pull_policy: if_not_present
 
   open_notebook:
     image: lfnovo/open_notebook:v1-latest
@@ -33,4 +33,4 @@ services:
     depends_on:
       - surrealdb
     restart: always
-    pull_policy: always
+    pull_policy: if_not_present
