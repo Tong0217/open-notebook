@@ -65,6 +65,9 @@ PROVIDER_CONFIG = {
     "dashscope": {
         "env_var": "DASHSCOPE_API_KEY",
     },
+    "bailian": {
+        "env_var": "DASHSCOPE_API_KEY",  # Bailian uses DashScope API key
+    },
     "minimax": {
         "env_var": "MINIMAX_API_KEY",
     },

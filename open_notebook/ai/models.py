@@ -155,8 +155,8 @@ class ModelManager:
                 config=config,
             )
         elif model.type == "embedding":
-            # DashScope embedding uses OpenAI-compatible API
-            if provider == "dashscope":
+            # DashScope/Bailian embedding uses OpenAI-compatible API
+            if provider in ("dashscope", "bailian"):
                 config["base_url"] = "https://dashscope.aliyuncs.com/compatible-mode/v1"
                 provider = "openai-compatible"
             return AIFactory.create_embedding(
@@ -171,10 +171,10 @@ class ModelManager:
                 config=config,
             )
         elif model.type == "text_to_speech":
-            # DashScope TTS uses native API (not OpenAI-compatible)
-            if provider == "dashscope":
-                from open_notebook.ai.bailian_tts import BailianTextToSpeech
-                return BailianTextToSpeech(
+            # DashScope/Bailian TTS uses native API (not OpenAI-compatible)
+            if provider in ("dashscope", "bailian"):
+                from open_notebook.ai.bailian_tts import DashScopeTextToSpeech
+                return DashScopeTextToSpeech(
                     model_name=model.name,
                     config=config,
                 )

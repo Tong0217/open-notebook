@@ -706,6 +706,7 @@ PROVIDER_DISCOVERY_FUNCTIONS = {
     "elevenlabs": discover_elevenlabs_models,
     "openai_compatible": discover_openai_compatible_models,
     "dashscope": discover_dashscope_models,
+    "bailian": discover_dashscope_models,  # Alias for dashscope
     "minimax": discover_minimax_models,
     "azure": None,  # Azure requires credential-based discovery (different auth)
     "vertex": None,  # Vertex requires credential-based discovery (service account)
