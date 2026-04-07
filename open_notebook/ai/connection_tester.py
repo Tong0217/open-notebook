@@ -416,9 +416,12 @@ async def test_individual_model(model) -> Tuple[bool, str]:
             result = await esp_model.agenerate_speech(
                 text="Hello from Open Notebook", voice=voice
             )
-            if result and hasattr(result, "content"):
-                size = len(result.content)
-                return True, f"Audio generated: {size} bytes"
+            # AudioResponse uses audio_data attribute
+            if result:
+                audio_data = getattr(result, "audio_data", None) or getattr(result, "content", None)
+                if audio_data:
+                    size = len(audio_data)
+                    return True, f"Audio generated: {size} bytes"
             return True, "Speech generation successful"
 
         elif model.type == "speech_to_text":
