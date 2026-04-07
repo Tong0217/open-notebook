@@ -58,7 +58,6 @@ PROVIDER_ENV_CONFIG: Dict[str, dict] = {
         "required_any": ["OPENAI_COMPATIBLE_BASE_URL", "OPENAI_COMPATIBLE_API_KEY"],
     },
     "dashscope": {"required": ["DASHSCOPE_API_KEY"]},
-    "bailian": {"required": ["DASHSCOPE_API_KEY"]},  # Alias for dashscope
     "minimax": {"required": ["MINIMAX_API_KEY"]},
 }
 
@@ -78,7 +77,6 @@ PROVIDER_MODALITIES: Dict[str, List[str]] = {
     "azure": ["language", "embedding", "speech_to_text", "text_to_speech"],
     "openai_compatible": ["language", "embedding", "speech_to_text", "text_to_speech"],
     "dashscope": ["language", "embedding", "text_to_speech"],
-    "bailian": ["language", "embedding", "text_to_speech"],  # Alias for dashscope
     "minimax": ["language"],
 }
 

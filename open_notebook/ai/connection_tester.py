@@ -35,7 +35,6 @@ TEST_MODELS = {
     "azure": ("gpt-35-turbo", "language"),  # Azure OpenAI deployment name
     "openai_compatible": (None, "language"),  # Dynamic - will use first available model
     "dashscope": ("qwen-plus", "language"),
-    "bailian": ("qwen-plus", "language"),  # Alias for dashscope
     "minimax": ("MiniMax-M2.5", "language"),
 }
 
