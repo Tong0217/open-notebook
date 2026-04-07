@@ -189,21 +189,23 @@ start-all:
 	fi
 	@docker info >/dev/null 2>&1 || { echo "❌ Docker failed to start. Please start it manually."; exit 1; }
 	@echo "✅ Docker is running"
+	@mkdir -p logs
 	@echo "📊 Starting SurrealDB..."
 	@docker compose up -d surrealdb
 	@sleep 3
 	@echo "🔧 Starting API backend..."
-	@env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u all_proxy -u ALL_PROXY -u no_proxy -u NO_PROXY uv run run_api.py &
+	@nohup env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u all_proxy -u ALL_PROXY -u no_proxy -u NO_PROXY uv run run_api.py > logs/api.log 2>&1 &
 	@sleep 3
 	@echo "⚙️ Starting background worker..."
-	@env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u all_proxy -u ALL_PROXY -u no_proxy -u NO_PROXY uv run --env-file .env surreal-commands-worker --import-modules commands &
+	@nohup env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u all_proxy -u ALL_PROXY -u no_proxy -u NO_PROXY uv run --env-file .env surreal-commands-worker --import-modules commands > logs/worker.log 2>&1 &
 	@sleep 2
 	@echo "🌐 Starting Next.js frontend..."
+	@cd frontend && nohup npm run dev > ../logs/frontend.log 2>&1 &
 	@echo "✅ All services started!"
 	@echo "📱 Frontend: http://localhost:3000"
 	@echo "🔗 API: http://localhost:5055"
 	@echo "📚 API Docs: http://localhost:5055/docs"
-	cd frontend && npm run dev
+	@echo "📋 Logs directory: logs/"
 
 stop-all:
 	@echo "🛑 Stopping all Open Notebook services..."
