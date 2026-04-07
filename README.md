@@ -213,7 +213,7 @@ Thanks to the [Esperanto](https://github.com/lfnovo/esperanto) library, we suppo
 | Voyage       | ❌          | ✅               | ❌             | ❌             |
 | xAI          | ✅          | ❌               | ❌             | ❌             |
 | OpenRouter   | ✅          | ❌               | ❌             | ❌             |
-| DashScope (Qwen) | ✅          | ❌               | ❌             | ❌             |
+| DashScope (Qwen) | ✅          | ✅               | ❌             | ✅             |
 | MiniMax      | ✅          | ❌               | ❌             | ❌             |
 | OpenAI Compatible* | ✅          | ❌               | ❌             | ❌             |
 

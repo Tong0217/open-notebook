@@ -309,6 +309,7 @@ DEFAULT_TEST_VOICES = {
     "google": "Kore",
     "vertex": "Kore",
     "openai_compatible": "alloy",
+    "dashscope": "Cherry",  # DashScope TTS default voice
 }
 
 

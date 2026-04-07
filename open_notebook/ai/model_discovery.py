@@ -133,6 +133,8 @@ ELEVENLABS_MODEL_TYPES = {
 
 DASHSCOPE_MODEL_TYPES = {
     "language": ["qwen"],
+    "embedding": ["text-embedding"],
+    "text_to_speech": ["qwen3-tts", "cosyvoice"],
 }
 
 MINIMAX_MODEL_TYPES = {
@@ -529,7 +531,13 @@ async def discover_elevenlabs_models() -> List[DiscoveredModel]:
 
 
 async def discover_dashscope_models() -> List[DiscoveredModel]:
-    """Fetch available models from DashScope (Qwen) API."""
+    """Fetch available models from DashScope (Qwen) API.
+    
+    DashScope supports:
+    - Language models via OpenAI-compatible API
+    - Embedding models via OpenAI-compatible API
+    - TTS models via native API (not in compatible-mode, so we add them statically)
+    """
     api_key = os.environ.get("DASHSCOPE_API_KEY")
     if not api_key:
         return []
@@ -537,6 +545,8 @@ async def discover_dashscope_models() -> List[DiscoveredModel]:
     models = []
     try:
         async with httpx.AsyncClient() as client:
+            # Fetch models from OpenAI-compatible endpoint
+            # This returns language and embedding models
             response = await client.get(
                 "https://dashscope.aliyuncs.com/compatible-mode/v1/models",
                 headers={"Authorization": f"Bearer {api_key}"},
@@ -556,8 +566,25 @@ async def discover_dashscope_models() -> List[DiscoveredModel]:
                             model_type=model_type,
                         )
                     )
+                    
     except Exception as e:
         logger.warning(f"Failed to discover DashScope models: {e}")
+
+    # Add TTS models statically (not available via OpenAI-compatible API)
+    # DashScope TTS uses native API endpoint
+    tts_models = [
+        "qwen3-tts-flash",  # Qwen3 TTS flash model
+        "qwen3-tts",        # Qwen3 TTS standard model
+        "cosyvoice-v1",     # CosyVoice model
+    ]
+    for model_name in tts_models:
+        models.append(
+            DiscoveredModel(
+                name=model_name,
+                provider="dashscope",
+                model_type="text_to_speech",
+            )
+        )
 
     return models
 
