@@ -862,6 +862,41 @@ Async job submission (source processing, podcast generation) prevents request ti
 3. Override via per-request config (no code changes needed)
 4. Test fallback logic if provider unavailable
 
+### Custom AI Provider: DashScope TTS (Monkey Patch)
+
+> **⚠️ Important**: This is a temporary monkey patch that must be maintained across dependency updates.
+
+**Problem**: The `podcast_creator` library uses `esperanto.AIFactory.create_text_to_speech()` which doesn't support `dashscope` provider. The DashScope TTS API uses a different protocol than OpenAI-compatible APIs.
+
+**Solution**: A monkey patch in `commands/podcast_commands.py` intercepts TTS creation calls:
+
+```python
+# Location: commands/podcast_commands.py
+def _patch_esperanto_for_dashscope():
+    """Inject DashScope TTS support into esperanto.AIFactory."""
+    from esperanto import AIFactory
+    from open_notebook.ai.bailian_tts import DashScopeTextToSpeech
+    
+    _original_create_tts = AIFactory.create_text_to_speech
+    
+    @staticmethod
+    def _patched_create_tts(provider: str, model_name: str, **kwargs):
+        if provider == "dashscope":
+            return DashScopeTextToSpeech(model_name=model_name, config=kwargs)
+        return _original_create_tts(provider, model_name, **kwargs)
+    
+    AIFactory.create_text_to_speech = _patched_create_tts
+
+_patch_esperanto_for_dashscope()
+```
+
+**Files Involved**:
+- `commands/podcast_commands.py` - Monkey patch injection
+- `open_notebook/ai/bailian_tts.py` - DashScope TTS implementation
+- `open_notebook/ai/models.py` - Model factory routing
+
+**If `podcast_creator` or `esperanto` is updated**, verify this patch still works and update if necessary.
+
 ---
 
 ## Deployment Considerations

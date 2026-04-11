@@ -23,6 +23,36 @@ except ImportError as e:
     raise ValueError("podcast_creator library not available")
 
 
+# =============================================================================
+# Monkey patch esperanto to support DashScope TTS
+# =============================================================================
+def _patch_esperanto_for_dashscope():
+    """Inject DashScope TTS support into esperanto.AIFactory."""
+    try:
+        from esperanto import AIFactory
+        from open_notebook.ai.bailian_tts import DashScopeTextToSpeech
+        
+        _original_create_tts = AIFactory.create_text_to_speech
+        
+        @staticmethod
+        def _patched_create_tts(provider: str, model_name: str, **kwargs):
+            if provider == "dashscope":
+                return DashScopeTextToSpeech(
+                    model_name=model_name,
+                    config=kwargs,
+                )
+            return _original_create_tts(provider, model_name, **kwargs)
+        
+        AIFactory.create_text_to_speech = _patched_create_tts
+        logger.info("Patched esperanto.AIFactory to support DashScope TTS")
+    except Exception as e:
+        logger.warning(f"Failed to patch esperanto for DashScope: {e}")
+
+
+_patch_esperanto_for_dashscope()
+# =============================================================================
+
+
 def build_episode_output_dir(data_folder: str) -> tuple[str, Path]:
     """Build a filesystem-safe output directory path for a podcast episode.
 

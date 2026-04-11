@@ -151,9 +151,9 @@ class DashScopeTextToSpeech:
                 )
                 
                 if response.status_code == 429:
-                    logger.warning("DashScope TTS rate limit hit, waiting 2 seconds...")
+                    logger.warning("DashScope TTS rate limit hit, waiting 10 seconds...")
                     import time
-                    time.sleep(2)
+                    time.sleep(10)
                     response = client.post(
                         self.API_ENDPOINT,
                         json=payload,
@@ -227,8 +227,8 @@ class DashScopeTextToSpeech:
                 )
                 
                 if response.status_code == 429:
-                    logger.warning("DashScope TTS rate limit hit, waiting 2 seconds...")
-                    await asyncio.sleep(2)
+                    logger.warning("DashScope TTS rate limit hit, waiting 10 seconds...")
+                    await asyncio.sleep(10)
                     response = await client.post(
                         self.API_ENDPOINT,
                         json=payload,
